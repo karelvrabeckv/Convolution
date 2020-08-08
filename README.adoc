@@ -1,0 +1,208 @@
+== **Základní informace**
+
+**Název:** Konvoluce 2
+
+**Obrázek:**
+ 
+image::img1.jpg[]
+ 
+**Datum vydání:** 26. 10. 19
+
+**Doba vývoje:** 14 dní
+
+**Programovací jazyk:** C
+
+**Program:** GIMP 2.8
+
+**Operační systém:** Linux Debian (64-bit)
+
+**Vývojové prostředí:** obraz virtuálního počítače pro testování semestrálních úloh z předmětu BI-PA2 spuštěný ve Virtual Boxu
+
+== **Popis**
+
+**Konvoluce 2** je plug-in, který umožňuje upravovat 2D obrázky pomocí konvoluce. Nabízí až 5 základních filtrů – **Sharpen** (zaostření), **Gaussian Blur** (rozostření), **Box Blur** (rozmazání), **Edge Detection** (detekce hran) a **Emboss** (reliéf).
+
+Pro filtry Sharpen, Gaussian Blur a Box Blur je navíc k dispozici volba **radiusu** – hodnoty, která udává sílu daného filtru. Filtr Edge Detection je možné použít ve třech různých variantách.
+
+Specialitou tohoto plug-inu je poslední možnost ve výběru filtrů – **Customize**. Tato možnost zobrazí matici, která uživateli umožňuje vytvářet mnohem více konvolučních filtrů a neomezuje jej tak na filtry v nabídce. Společně s maticí je k dispozici i přednastavení čtyř základních filtrů. Uživatelem nastavená matice se zachovává do dalších instancí plug-inu. Náhled reaguje na každou změnu jejích hodnot.
+
+image::2D/img/documentation/Customize.jpg[]
+
+== **Filtry**
+
+Pro ukázky filtrů v této dokumentaci jsem zvolil obrázek Lenny.
+
+image::2D/img/test/Lenna.png[]
+
+=== Sharpen
+
+**Radius:** 1–3
+
+**Základní matice:**
+
+-1 -1 -1 +
+-1 9 -1 +
+-1 -1 -1 +
+
+**Popisek:** Zaostřuje obrázek. Pro radius 1 je výsledek přijatelný, u vyššího radiusu však dochází k deformaci obrázku.
+
+image::2D/img/documentation/Sharpen 1.jpg[]
+image::2D/img/documentation/Sharpen 2.jpg[]
+image::2D/img/documentation/Sharpen 3.jpg[]
+
+=== Gaussian Blur
+
+**Radius:** 1–2
+
+**Základní matice:**
+
+1 2 1 +
+2 4 2 +
+1 2 1 +
+
+**Popisek:** Hladce rozostřuje obrázek. Rozdíl lze rozpoznat až u vyššího radiusu (to platí speciálně pro velké obrázky).
+
+image::2D/img/documentation/Gaussian Blur 1.jpg[]
+image::2D/img/documentation/Gaussian Blur 2.jpg[]
+
+=== Box Blur
+
+**Radius:** 1–3
+
+**Základní matice:**
+
+1 1 1 +
+1 1 1 +
+1 1 1 +
+
+**Popisek:** Výrazně rozmazává obrázek. Podobně jako u filtru Gaussian Blur lze rozdíl rozpoznat až u vyššího radiusu.
+
+image::2D/img/documentation/Box Blur 1.jpg[]
+image::2D/img/documentation/Box Blur 2.jpg[]
+image::2D/img/documentation/Box Blur 3.jpg[]
+
+=== Edge Detection 1–3
+
+**Základní matice:**
+
+1 0 -1 +
+0 0 0 +
+-1 0 1 +
+
+0 1 0 +
+1 -4 1 +
+0 1 0 +
+
+-1 -1 -1 +
+-1 8 -1 +
+-1 -1 -1 +
+
+**Popisek:** Vyhledává hrany ve třech možných variantách.
+
+image::2D/img/documentation/Edge Detection 1.jpg[]
+image::2D/img/documentation/Edge Detection 2.jpg[]
+image::2D/img/documentation/Edge Detection 3.jpg[]
+
+=== Emboss
+
+**Základní matice:**
+
+-2 -1 0 +
+-1 1 1 +
+0 1 2 +
+
+**Popisek:** Vytváří reliéf.
+
+image::2D/img/documentation/Emboss.jpg[]
+
+== **Instalace (Linux)**
+1.	Otevřete terminál.
+2.	Pomocí příkazu **echo $HOME** zjistěte vaši domovskou složku.
+3.	Do této složky vložte ručně soubor **convolution-2.c** a přesuňte se do ní pomocí příkazu **cd $HOME**.
+4.	Zadejte následující příkazy:
+
+** **sudo apt update**
+*** aktualizuje všechny nainstalované balíčky
+
+** **sudo apt install gimp**
+*** nainstaluje GIMP
+ 
+** **sudo apt install libgimp2.0-dev**
+*** nainstaluje balíček pro práci s plug-iny
+ 
+** **gimptool-2.0 --install convolution-2.c**
+*** zkompiluje a nainstaluje plug-in
+
+** **gimp**
+*** spustí GIMP
+
+5.	Otevřete v GIMPu nějaký obrázek.
+6.	Běžte do záložky **„Filters/Misc“** a klikněte na **„Convolution 2…“**, čímž spustíte plug-in.
+
+== **Program**
+
+Kód plug-inu je rozdělen do několika částí:
+
+* Načtení plug-inu
+* Algoritmus konvoluce
+* Posluchače událostí
+* GUI
+
+**Načtení plug-inu** zahrnuje import všech důležitých knihoven, funkční prototypy, strukturu pro zachování uživatelem nastavených hodnot, proměnnou __PLUG_IN_INFO__, __MAIN__ a funkce __query__ pro registraci a __run__ pro spuštění samotného plug-inu.
+
+Jako ukázku této části kódu jsem zvolil funkci __query__, která zaregistruje plug-in do __Procedural Database__ (tzv. PDB) a hlavního menu:
+
+image::2D/img/documentation/Loading.jpg[]
+
+**Algoritmus konvoluce** funguje na velice jednoduchém principu. Pro každý pixel v obrázku je proveden součet barevných hodnot jeho sousedů a jeho samotného. Každý sčítanec je navíc vynásoben odpovídající hodnotou z **konvoluční matice**. Čím větší je tato matice, tím je zpracováno více sousedních pixelů. Algoritmus tak může být pomalejší, ale výsledek je o to výraznější. Velikost konvoluční matice určuje **radius** podle rovnice: __velikost_matice = 2 * hodnota_radiusu + 1__. Po získání součtu sčítanců pronásobených hodnotami konvoluční matice je tato hodnota vydělena **normalizátorem** (tj. součet hodnot konvoluční matice), který slouží pro usměrnění výsledku. Takto znormalizovaný výsledek následně uložíme do právě zpracovávaného pixelu. Díky tomuto principu můžeme dosáhnout mnoha rozličných grafických úprav, které se liší pouze v hodnotách konvoluční matice.
+
+Problém nastává na okrajích obrázku, kde pixely nemusí mít nutně na všech stranách sousedy. Tato situace je v pluginu řešena **zrcadlově**. Pokud se algoritmus při zpracování sousedů dostane mimo obrázek, je započítán osově souměrný pixel atp.
+
+Jako ukázku této části kódu jsem zvolil alokaci paměti pro 2D pole pixelů:
+
+image::2D/img/documentation/Convolution.jpg[]
+
+**Posluchače událostí** slouží k odposlouchávání akcí, které uživatel provede v rámci GUI. Odposlouchávána jsou všechna tlačítka včetně volby radiusu, položek v seznamu atd.
+
+Jako ukázku této části kódu jsem zvolil posluchač, který zobrazí matici s přednastavením poté, co uživatel klikne na položku **Customize…** ve výběru filtrů. V případě ostatních položek zmíněné prvky skryje.
+
+image::2D/img/documentation/Listeners.jpg[]
+
+**GUI** zajišťuje grafické uživatelské rozhraní celého plug-inu. Jelikož je kód prvků GUI v programovacím jazyce C značně expanzivní, tato část společně s posluchači událostí tvoří více než polovinu celého kódu plug-inu.
+
+Jako ukázka poslouží kód náhledu, který uživateli umožňuje prohlédnout si aplikaci zvoleného filtru na výřezu obrázku o velikosti 250 x 250 px.
+
+image::2D/img/documentation/GUI.jpg[]
+
+== **Testování**
+
+Plug-in je kompatibilní s **GIMPem 2.8** na operačním systému **Linux Debian**. K testování plug-inu a všech filtrů jsem použil čtyři obrázky – **Lenna** (512 x 512 px), **logo** (704 x 933 px), **4K**, **8K**.
+
+image::2D/img/test/Lenna.png[]
+image::2D/img/test/Logo.png[]
+image::2D/img/test/4K.jpg[]
+image::2D/img/test/8K.jpg[]
+
+Na obrazu virtuálního počítače pro testování semestrálních úloh z předmětu BI-PA2 spuštěném ve Virtual Boxu plug-in pracoval bez problémů pro Lennu, logo a 4K obrázek. U 8K obrázku se objevovaly problémy v podobě nedostatečné paměti, kterou se GIMPu nepodařilo alokovat. Plug-in se vždy spustil nejvýše jednou (podobně jako všechny ostatní filtry v GIMPu). Z tohoto důvodu jsem do plug-inu přidal jednoduché kontroly, které uživatele omezují na použití nejvýše 4K obrázku:
+
+image::2D/img/documentation/Testing.jpg[]
+
+Na školním počítači však fungovaly všechny testované obrázky včetně 8K bez problému.
+
+== **Reference**
+
+https://developer.gimp.org/
+
+https://developer.gnome.org/
+
+https://stackoverflow.com/
+
+https://docs.gimp.org/2.2/cs/plug-in-convmatrix.html
+
+https://is.mendelu.cz/eknihovna/opory/zobraz_cast.pl?cast=18431
+
+https://en.wikipedia.org/wiki/Kernel_(image_processing)
+
+http://people.ciirc.cvut.cz/~hlavac/TeachPresCz/11DigZprObr/21ImagPreprocCz.pdf
+
+https://bruxy.regnet.cz/fel/36ACS/konvoluce.pdf
