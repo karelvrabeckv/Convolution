@@ -4,7 +4,7 @@
 
 **Obrázek:**
  
-image::img1.jpg[]
+image::img/documentation/Result.jpg[]
  
 **Datum vydání:** 26. 10. 19
 
@@ -26,13 +26,13 @@ Pro filtry Sharpen, Gaussian Blur a Box Blur je navíc k dispozici volba **radiu
 
 Specialitou tohoto plug-inu je poslední možnost ve výběru filtrů – **Customize**. Tato možnost zobrazí matici, která uživateli umožňuje vytvářet mnohem více konvolučních filtrů a neomezuje jej tak na filtry v nabídce. Společně s maticí je k dispozici i přednastavení čtyř základních filtrů. Uživatelem nastavená matice se zachovává do dalších instancí plug-inu. Náhled reaguje na každou změnu jejích hodnot.
 
-image::2D/img/documentation/Customize.jpg[]
+image::img/documentation/Customize.jpg[]
 
 == **Filtry**
 
 Pro ukázky filtrů v této dokumentaci jsem zvolil obrázek Lenny.
 
-image::2D/img/test/Lenna.png[]
+image::img/test/Lenna.png[]
 
 === Sharpen
 
@@ -46,9 +46,9 @@ image::2D/img/test/Lenna.png[]
 
 **Popisek:** Zaostřuje obrázek. Pro radius 1 je výsledek přijatelný, u vyššího radiusu však dochází k deformaci obrázku.
 
-image::2D/img/documentation/Sharpen 1.jpg[]
-image::2D/img/documentation/Sharpen 2.jpg[]
-image::2D/img/documentation/Sharpen 3.jpg[]
+image::img/documentation/Sharpen 1.jpg[]
+image::img/documentation/Sharpen 2.jpg[]
+image::img/documentation/Sharpen 3.jpg[]
 
 === Gaussian Blur
 
@@ -62,8 +62,8 @@ image::2D/img/documentation/Sharpen 3.jpg[]
 
 **Popisek:** Hladce rozostřuje obrázek. Rozdíl lze rozpoznat až u vyššího radiusu (to platí speciálně pro velké obrázky).
 
-image::2D/img/documentation/Gaussian Blur 1.jpg[]
-image::2D/img/documentation/Gaussian Blur 2.jpg[]
+image::img/documentation/Gaussian Blur 1.jpg[]
+image::img/documentation/Gaussian Blur 2.jpg[]
 
 === Box Blur
 
@@ -77,9 +77,9 @@ image::2D/img/documentation/Gaussian Blur 2.jpg[]
 
 **Popisek:** Výrazně rozmazává obrázek. Podobně jako u filtru Gaussian Blur lze rozdíl rozpoznat až u vyššího radiusu.
 
-image::2D/img/documentation/Box Blur 1.jpg[]
-image::2D/img/documentation/Box Blur 2.jpg[]
-image::2D/img/documentation/Box Blur 3.jpg[]
+image::img/documentation/Box Blur 1.jpg[]
+image::img/documentation/Box Blur 2.jpg[]
+image::img/documentation/Box Blur 3.jpg[]
 
 === Edge Detection 1–3
 
@@ -99,9 +99,9 @@ image::2D/img/documentation/Box Blur 3.jpg[]
 
 **Popisek:** Vyhledává hrany ve třech možných variantách.
 
-image::2D/img/documentation/Edge Detection 1.jpg[]
-image::2D/img/documentation/Edge Detection 2.jpg[]
-image::2D/img/documentation/Edge Detection 3.jpg[]
+image::img/documentation/Edge Detection 1.jpg[]
+image::img/documentation/Edge Detection 2.jpg[]
+image::img/documentation/Edge Detection 3.jpg[]
 
 === Emboss
 
@@ -113,7 +113,7 @@ image::2D/img/documentation/Edge Detection 3.jpg[]
 
 **Popisek:** Vytváří reliéf.
 
-image::2D/img/documentation/Emboss.jpg[]
+image::img/documentation/Emboss.jpg[]
 
 == **Instalace (Linux)**
 1.	Otevřete terminál.
@@ -152,7 +152,7 @@ Kód plug-inu je rozdělen do několika částí:
 
 Jako ukázku této části kódu jsem zvolil funkci __query__, která zaregistruje plug-in do __Procedural Database__ (tzv. PDB) a hlavního menu:
 
-image::2D/img/documentation/Loading.jpg[]
+image::img/documentation/Loading.jpg[]
 
 **Algoritmus konvoluce** funguje na velice jednoduchém principu. Pro každý pixel v obrázku je proveden součet barevných hodnot jeho sousedů a jeho samotného. Každý sčítanec je navíc vynásoben odpovídající hodnotou z **konvoluční matice**. Čím větší je tato matice, tím je zpracováno více sousedních pixelů. Algoritmus tak může být pomalejší, ale výsledek je o to výraznější. Velikost konvoluční matice určuje **radius** podle rovnice: __velikost_matice = 2 * hodnota_radiusu + 1__. Po získání součtu sčítanců pronásobených hodnotami konvoluční matice je tato hodnota vydělena **normalizátorem** (tj. součet hodnot konvoluční matice), který slouží pro usměrnění výsledku. Takto znormalizovaný výsledek následně uložíme do právě zpracovávaného pixelu. Díky tomuto principu můžeme dosáhnout mnoha rozličných grafických úprav, které se liší pouze v hodnotách konvoluční matice.
 
@@ -160,32 +160,32 @@ Problém nastává na okrajích obrázku, kde pixely nemusí mít nutně na vše
 
 Jako ukázku této části kódu jsem zvolil alokaci paměti pro 2D pole pixelů:
 
-image::2D/img/documentation/Convolution.jpg[]
+image::img/documentation/Convolution.jpg[]
 
 **Posluchače událostí** slouží k odposlouchávání akcí, které uživatel provede v rámci GUI. Odposlouchávána jsou všechna tlačítka včetně volby radiusu, položek v seznamu atd.
 
 Jako ukázku této části kódu jsem zvolil posluchač, který zobrazí matici s přednastavením poté, co uživatel klikne na položku **Customize…** ve výběru filtrů. V případě ostatních položek zmíněné prvky skryje.
 
-image::2D/img/documentation/Listeners.jpg[]
+image::img/documentation/Listeners.jpg[]
 
 **GUI** zajišťuje grafické uživatelské rozhraní celého plug-inu. Jelikož je kód prvků GUI v programovacím jazyce C značně expanzivní, tato část společně s posluchači událostí tvoří více než polovinu celého kódu plug-inu.
 
 Jako ukázka poslouží kód náhledu, který uživateli umožňuje prohlédnout si aplikaci zvoleného filtru na výřezu obrázku o velikosti 250 x 250 px.
 
-image::2D/img/documentation/GUI.jpg[]
+image::img/documentation/GUI.jpg[]
 
 == **Testování**
 
 Plug-in je kompatibilní s **GIMPem 2.8** na operačním systému **Linux Debian**. K testování plug-inu a všech filtrů jsem použil čtyři obrázky – **Lenna** (512 x 512 px), **logo** (704 x 933 px), **4K**, **8K**.
 
-image::2D/img/test/Lenna.png[]
-image::2D/img/test/Logo.png[]
-image::2D/img/test/4K.jpg[]
-image::2D/img/test/8K.jpg[]
+image::img/test/Lenna.png[]
+image::img/test/Logo.png[]
+image::img/test/4K.jpg[]
+image::img/test/8K.jpg[]
 
 Na obrazu virtuálního počítače pro testování semestrálních úloh z předmětu BI-PA2 spuštěném ve Virtual Boxu plug-in pracoval bez problémů pro Lennu, logo a 4K obrázek. U 8K obrázku se objevovaly problémy v podobě nedostatečné paměti, kterou se GIMPu nepodařilo alokovat. Plug-in se vždy spustil nejvýše jednou (podobně jako všechny ostatní filtry v GIMPu). Z tohoto důvodu jsem do plug-inu přidal jednoduché kontroly, které uživatele omezují na použití nejvýše 4K obrázku:
 
-image::2D/img/documentation/Testing.jpg[]
+image::img/documentation/Testing.jpg[]
 
 Na školním počítači však fungovaly všechny testované obrázky včetně 8K bez problému.
 
